@@ -23,7 +23,7 @@ tun:
   dns-hijack:
     - any:53
 dns:
-  enable: true
+  enable: false # 默认走运营商 dns
   ipv6: true
   listen: 0.0.0.0:53
   enhanced-mode: fake-ip
@@ -121,7 +121,31 @@ proxy-groups:
       - ibcn
       - hitun
       - flyint
-
+  - name: ⚖️ 负载均衡-散列
+    type: load-balance
+    url: 'http://www.google.com/generate_204'
+    interval: 300
+    include-all: true
+    filter: '钻石|黄金'
+    strategy: consistent-hashing
+    proxies:
+      - 🐈‍⬛ Auto-Select
+      - ibcn
+      - 🔙fallback
+  - name: ⚖️ 负载均衡-轮询
+    type: load-balance
+    url: 'http://www.google.com/generate_204'
+    interval: 300
+    strategy: round-robin
+    proxies:
+      - 🔙fallback
+      - 🐈‍⬛ Auto-Select
+      - ibcn
+  - name: 🔙fallback
+    type: fallback
+    use:
+      - ibcn
+    filter: "黄金|白银"
   # 机场列表
   - name: "ibcn"
     type: select # 亦可使用 fallback 或 load-balance
@@ -237,27 +261,21 @@ rule-providers:
     interval: 86400
 
 rules:
-  - DOMAIN-KEYWORD,github,🐈‍⬛ Auto-Select
-  - DOMAIN-KEYWORD,ghcr.io,🐈‍⬛ Auto-Select
-  - DOMAIN-KEYWORD,github1s,🐈‍⬛ Auto-Select
-  - DOMAIN-KEYWORD,v2ex,🐈‍⬛ Auto-Select
-  - DOMAIN-KEYWORD,bing.com,🐈‍⬛ Auto-Select
-  - DOMAIN-KEYWORD,hitun,🐈‍⬛ Auto-Select
-  - DOMAIN-KEYWORD,postman,🐈‍⬛ Auto-Select
-  - DOMAIN-KEYWORD,jwt,🐈‍⬛ Auto-Select
-  - DOMAIN-KEYWORD,stackoverflow,🐈‍⬛ Auto-Select
-  - DOMAIN-SUFFIX,v2rayssr.com,🐈‍⬛ Auto-Select
-  - DOMAIN-KEYWORD,notion,🐈‍⬛ Auto-Select
-  - DOMAIN-KEYWORD,tiktok,🐈‍⬛ Auto-Select
-  - DOMAIN-KEYWORD,githubusercontent,🐈‍⬛ Auto-Select
-  - DOMAIN-KEYWORD,stackoverflow,🐈‍⬛ Auto-Select
+  - DOMAIN-KEYWORD,ghcr.io,🚀 Proxy
+  - DOMAIN-KEYWORD,github1s,🚀 Proxy
+  - DOMAIN-KEYWORD,hitun,🚀 Proxy
+  - DOMAIN-SUFFIX,postman.com,🚀 Proxy
+  - DOMAIN-SUFFIX,jwt.io,🚀 Proxy
+  - DOMAIN-SUFFIX,v2rayssr.com,🚀 Proxy
   # - DOMAIN-KEYWORD,openai,🤖 CHATGPT
   # - DOMAIN-KEYWORD,ai,🤖 CHATGPT
   - DOMAIN-SUFFIX,sentry.io,REJECT
   - DOMAIN-SUFFIX,router.asus.com,DIRECT
-  - DOMAIN-KEYWORD,githubusercontent,🐈‍⬛ Auto-Select
-  - DOMAIN-KEYWORD,reddit,🐈‍⬛ Auto-Select
+  - DOMAIN-SUFFIX,binance.com,🚀 Proxy
   - DOMAIN-SUFFIX,invoice.mugglepay.com,DIRECT
+  - DOMAIN-SUFFIX,golang.design,DIRECT
+  - DOMAIN-SUFFIX,bulianglin.com,🚀 Proxy
+  - DOMAIN-SUFFIX,ipleak.net,🚀 Proxy
 
   # rule-providers
   - RULE-SET,private,DIRECT
@@ -265,11 +283,13 @@ rules:
   - RULE-SET,icloud,DIRECT
   - RULE-SET,apple,DIRECT
   - RULE-SET,google,DIRECT
-  - RULE-SET,proxy,🐈‍⬛ Auto-Select
   - RULE-SET,direct,DIRECT
   - RULE-SET,lancidr,DIRECT
   - RULE-SET,cncidr,DIRECT
-  - RULE-SET,telegramcidr,🐈‍⬛ Auto-Select
-  - GEOIP,LAN,DIRECT
-  - GEOIP,CN,DIRECT
-  - MATCH,🐈‍⬛ Auto-Select
+  - RULE-SET,proxy,🚀 Proxy
+  - RULE-SET,telegramcidr,🚀 Proxy
+
+  # 在最后面
+  - GEOIP,LAN,DIRECT # 任意局域网
+  - GEOIP,CN,DIRECT # 大陆地区
+  - MATCH,🚀 Proxy # 漏网之鱼, 默认代理
