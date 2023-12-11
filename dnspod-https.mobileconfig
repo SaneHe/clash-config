@@ -20,7 +20,7 @@
 			<key>PayloadDescription</key>
 			<string>Configures device to use DNSPod Encrypted DNS over HTTPS</string>
 			<key>PayloadDisplayName</key>
-			<string>DNSPod over HTTPS</string>
+			<string>WeChat DNSPod over HTTPS</string>
 			<key>PayloadIdentifier</key>
 			<string>com.apple.dnsSettings.managed.C498EC0C-EF6C-44F0-BFB7-0000658B99AC</string>
 			<key>PayloadType</key>
